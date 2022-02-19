@@ -8,13 +8,11 @@ orgs = boto3.client('organizations')
 def get_hierarchy(child_id: str):
     hierarchy = []
     if child_id.startswith('r-'):
-        return [
-            {
-                'Id': child_id,
-                'Name': 'Root',
-                'Type': 'ROOT'
-            }
-        ]
+        return [{
+            'Id': child_id,
+            'Name': 'Root',
+            'Type': 'ROOT'
+        }]
     elif child_id.startswith('ou-'):
         # Get OU name
         org_unit = orgs.describe_organizational_unit(OrganizationalUnitId=child_id)['OrganizationalUnit']
