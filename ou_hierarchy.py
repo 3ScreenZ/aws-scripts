@@ -29,6 +29,8 @@ def get_hierarchy(child_id: str):
             'Name': account_details['Name'],
             'Type': 'ACCOUNT'
         })
+    else:
+        raise Exception(f'Unknown child id format {child_id}')
 
     # Get parents of the child
     parents = build_list(orgs.list_parents, ChildId=child_id)['Parents']
