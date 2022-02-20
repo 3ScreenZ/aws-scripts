@@ -45,26 +45,23 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('--show-ids', action='store_true', help='Whether to include OU IDs')
     parser.add_argument('--format', choices=('text', 'json'), default='text')
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('--account-id', type=str, help='Account ID')
-    group.add_argument('--account-name', type=str, help='Account Name')
+    parser.add_argument('account', type=str, help='AWS Account ID or Name')
     opts = parser.parse_args()
 
     # Get account id from organization
     account_id = None
-    if not opts.account_id:
+    if opts.account.isnumeric():
+        account_id = opts.account
+    else:
         accounts = build_list(orgs.list_accounts)
 
         for account in accounts['Accounts']:
-            if account['Name'] == opts.account_name:
+            if account['Name'] == opts.account:
                 account_id = account['Id']
                 break
         
         if not account_id:
-            raise Exception(f'Account "{opts.account_name}" does not exist in this organization')
-
-    else:
-        account_id = opts.account_id
+            raise Exception(f'Account "{opts.account}" does not exist in this organization')
 
     # Get hierarchy
     hierarchy = get_hierarchy(account_id)
