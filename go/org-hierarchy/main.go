@@ -113,8 +113,8 @@ func main() {
 	var accountId string = *account
 	if re.MatchString(*account) {
 		accountId = *account
-	} else {
-		accountId = GetAccountId(account)
+		// } else {
+		// 	accountId = GetAccountId(account)
 	}
 
 	// Get hierarchy
