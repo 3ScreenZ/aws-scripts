@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/MichaelPalmer1/aws-scripts/go/utils"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/organizations"
 	"github.com/aws/aws-sdk-go-v2/service/organizations/types"
@@ -30,8 +31,9 @@ func GetEffectiveScpIds(targetId string, client *organizations.Client) ([]string
 		}
 
 		for _, policy := range results.Policies {
-			if !contains(policyIds, *policy.Id) {
-				policyIds = append(policyIds, *policy.Id)
+			policyId := aws.ToString(policy.Id)
+			if !utils.Contains(policyIds, policyId) {
+				policyIds = append(policyIds, policyId)
 			}
 		}
 	}
@@ -46,7 +48,7 @@ func GetEffectiveScpIds(targetId string, client *organizations.Client) ([]string
 		}
 
 		// Get SCPs on parent
-		parentId := *parents.Parents[0].Id
+		parentId := aws.ToString(parents.Parents[0].Id)
 		parentScpIds, err := GetEffectiveScpIds(parentId, client)
 		if err != nil {
 			return nil, err
@@ -69,11 +71,11 @@ func GetPolicies(policyIds []string, client *organizations.Client) (map[string]i
 		}
 
 		var policyContent interface{}
-		if err := json.Unmarshal([]byte(*policy.Policy.Content), &policyContent); err != nil {
+		if err := json.Unmarshal([]byte(aws.ToString(policy.Policy.Content)), &policyContent); err != nil {
 			return nil, err
 		}
 
-		policies[*policy.Policy.PolicySummary.Name] = policyContent
+		policies[aws.ToString(policy.Policy.PolicySummary.Name)] = policyContent
 	}
 
 	return policies, nil
@@ -100,11 +102,11 @@ func GetScps(client *organizations.Client) (map[string]SCP, error) {
 				return nil, err
 			}
 
-			if err := json.Unmarshal([]byte(*policyDetails.Policy.Content), &policyContent); err != nil {
+			if err := json.Unmarshal([]byte(aws.ToString(policyDetails.Policy.Content)), &policyContent); err != nil {
 				return nil, err
 			}
 
-			policies[*result.Name] = SCP{
+			policies[aws.ToString(result.Name)] = SCP{
 				Summary: result,
 				Content: policyContent,
 			}
@@ -112,14 +114,4 @@ func GetScps(client *organizations.Client) (map[string]SCP, error) {
 	}
 
 	return policies, nil
-}
-
-func contains(arr []string, value string) bool {
-	for _, item := range arr {
-		if item == value {
-			return true
-		}
-	}
-
-	return false
 }

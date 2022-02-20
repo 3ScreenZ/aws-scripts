@@ -9,14 +9,17 @@ import (
 
 	orgAccount "github.com/MichaelPalmer1/aws-scripts/go/org-account-id/lib"
 	hierarchy "github.com/MichaelPalmer1/aws-scripts/go/org-hierarchy/lib"
+	orgUtils "github.com/MichaelPalmer1/aws-scripts/go/org-utils"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/organizations"
 )
 
 func main() {
-	account := flag.String("account", "", "AWS Account ID or Name")
-	format := flag.String("format", "text", "Output format {text, json}")
-	showIds := flag.Bool("show-ids", false, "Whether to include OU IDs")
+	var account, format string
+	var showIds bool
+	flag.StringVar(&account, "account", "", "AWS Account ID or Name")
+	flag.StringVar(&format, "format", "text", "Output format {text, json}")
+	flag.BoolVar(&showIds, "show-ids", false, "Whether to include OU IDs")
 	flag.Parse()
 
 	cfg, err := config.LoadDefaultConfig(context.TODO())
@@ -27,11 +30,9 @@ func main() {
 	orgs := organizations.NewFromConfig(cfg)
 
 	// Get account id from organization
-	var accountId string = *account
-	if hierarchy.AccountRegex.MatchString(*account) {
-		accountId = *account
-	} else {
-		accountId = *orgAccount.GetAccountId(*account, orgs)
+	var accountId string = account
+	if !orgUtils.AccountRegex.MatchString(account) {
+		accountId = *orgAccount.GetAccountId(account, orgs)
 	}
 
 	// Get hierarchy
@@ -41,9 +42,9 @@ func main() {
 	}
 
 	// Output formats
-	if *format == "text" {
+	if format == "text" {
 		var results []string
-		if *showIds {
+		if showIds {
 			for _, item := range organization {
 				results = append(results, fmt.Sprintf("%s (%s)", item.Name, item.Id))
 			}
@@ -54,7 +55,7 @@ func main() {
 			}
 			fmt.Println(strings.Join(results, " -> "))
 		}
-	} else if *format == "json" {
+	} else if format == "json" {
 		bs, err := json.MarshalIndent(organization, "", "  ")
 		if err != nil {
 			panic(err)

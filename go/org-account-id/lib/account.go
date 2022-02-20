@@ -3,6 +3,7 @@ package account
 import (
 	"context"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/organizations"
 )
 
@@ -15,7 +16,7 @@ func GetAccountId(accountName string, client *organizations.Client) *string {
 		}
 
 		for _, account := range output.Accounts {
-			if *account.Name == accountName {
+			if aws.ToString(account.Name) == accountName {
 				return account.Id
 			}
 		}

@@ -3,9 +3,10 @@ package structure
 import (
 	"context"
 	"errors"
-	"regexp"
 	"strings"
 
+	orgUtils "github.com/MichaelPalmer1/aws-scripts/go/org-utils"
+	"github.com/MichaelPalmer1/aws-scripts/go/utils"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/organizations"
 	"github.com/aws/aws-sdk-go-v2/service/organizations/types"
@@ -18,12 +19,6 @@ type Structure struct {
 	Policies []string
 	OrgUnits []Structure
 	Accounts []Structure
-}
-
-var accountRegexp *regexp.Regexp
-
-func init() {
-	accountRegexp = regexp.MustCompile(`\d{12}`)
 }
 
 func GetPolicies(parentId string, client *organizations.Client) ([]string, error) {
@@ -41,8 +36,9 @@ func GetPolicies(parentId string, client *organizations.Client) ([]string, error
 		}
 
 		for _, policy := range output.Policies {
-			if !contains(policies, *policy.Name) {
-				policies = append(policies, *policy.Name)
+			policyName := aws.ToString(policy.Name)
+			if !utils.Contains(policies, policyName) {
+				policies = append(policies, policyName)
 			}
 		}
 	}
@@ -78,9 +74,9 @@ func GetChildren(parentId string, client *organizations.Client) (*Structure, err
 		if err != nil {
 			return nil, err
 		}
-		organization.Name = *orgUnit.OrganizationalUnit.Name
+		organization.Name = aws.ToString(orgUnit.OrganizationalUnit.Name)
 		organization.Type = "ORGANIZATIONAL_UNIT"
-	} else if accountRegexp.MatchString(parentId) {
+	} else if orgUtils.AccountRegex.MatchString(parentId) {
 		// Get account name
 		accountDetails, err := client.DescribeAccount(context.TODO(), &organizations.DescribeAccountInput{
 			AccountId: aws.String(parentId),
@@ -88,7 +84,7 @@ func GetChildren(parentId string, client *organizations.Client) (*Structure, err
 		if err != nil {
 			return nil, err
 		}
-		organization.Name = *accountDetails.Account.Name
+		organization.Name = aws.ToString(accountDetails.Account.Name)
 		organization.Type = "ACCOUNT"
 		return organization, nil
 	} else {
@@ -108,7 +104,7 @@ func GetChildren(parentId string, client *organizations.Client) (*Structure, err
 
 		// Go through all child OUs on this page
 		for _, childOrgUnit := range results.Children {
-			children, err := GetChildren(*childOrgUnit.Id, client)
+			children, err := GetChildren(aws.ToString(childOrgUnit.Id), client)
 			if err != nil {
 				return nil, err
 			}
@@ -129,7 +125,7 @@ func GetChildren(parentId string, client *organizations.Client) (*Structure, err
 
 		// Go through all child accounts on this page
 		for _, childAccount := range results.Children {
-			children, err := GetChildren(*childAccount.Id, client)
+			children, err := GetChildren(aws.ToString(childAccount.Id), client)
 			if err != nil {
 				return nil, err
 			}
@@ -138,14 +134,4 @@ func GetChildren(parentId string, client *organizations.Client) (*Structure, err
 	}
 
 	return organization, nil
-}
-
-func contains(arr []string, value string) bool {
-	for _, item := range arr {
-		if item == value {
-			return true
-		}
-	}
-
-	return false
 }
