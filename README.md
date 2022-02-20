@@ -122,3 +122,11 @@ Root (r-abc1)
     ]
 }
 ```
+
+## [Organization SCPs](org_scps.py)
+
+Fetch SCPs for an Organization
+
+## [Organization Account Id](org_account_id.py)
+
+Given an account name, get its account id from Organizations
