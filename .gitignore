@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 policies/
+*.json
 organization.png
 .vscode/
 .idea/

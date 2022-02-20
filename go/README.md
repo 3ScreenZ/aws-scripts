@@ -1,6 +1,6 @@
-# AWS Scripts - Python
+# AWS Scripts - Go
 
-## [Organization Hierarchy](org_hierarchy.py)
+## [Organization Hierarchy](org-hierarchy/main.go)
 
 Detects hierarchy of an under within an AWS Organization.
 
@@ -38,7 +38,7 @@ Root (r-abc1) -> product-a (ou-abc1-abcdef12) -> sku-a (ou-abc1-abcdef22) -> dev
 ]
 ```
 
-## [Organization Structure](org_structure.py)
+## [Organization Structure](org-structure/main.go)
 
 Renders structure of an AWS Organization. Supports text, json, and png outputs.
 
@@ -123,10 +123,10 @@ Root (r-abc1)
 }
 ```
 
-## [Organization SCPs](org_scps.py)
+## [Organization SCPs](org-scps/main.go)
 
 Fetch SCPs for an Organization
 
-## [Organization Account Id](org_account_id.py)
+## [Organization Account Id](org-account-id/main.go)
 
 Given an account name, get its account id from Organizations

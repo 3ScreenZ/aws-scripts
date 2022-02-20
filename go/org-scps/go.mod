@@ -1,9 +1,8 @@
-module github.com/MichaelPalmer1/aws-scripts/go/org-hierarchy
+module github.com/MichaelPalmer1/aws-scripts/go/org-scps
 
 go 1.17
 
 require (
-	github.com/MichaelPalmer1/aws-scripts/go/org-account-id v0.0.4
 	github.com/aws/aws-sdk-go-v2 v1.13.0
 	github.com/aws/aws-sdk-go-v2/config v1.13.1
 	github.com/aws/aws-sdk-go-v2/service/organizations v1.12.0
