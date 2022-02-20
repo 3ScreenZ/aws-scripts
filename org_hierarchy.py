@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from org_get_account_id import get_account_id
+from org_account_id import get_account_id
 from utils import build_list
 import boto3
 import json
