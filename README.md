@@ -36,7 +36,6 @@ Root (r-abc1) -> product-a (ou-abc1-abcdef12) -> sku-a (ou-abc1-abcdef22) -> dev
         "Type": "ACCOUNT"
     }
 ]
-Root (r-abc1) -> product-a (ou-abc1-abcdef12) -> sku-a (ou-abc1-abcdef22) -> dev (ou-abc1-abcdef33) -> account-1 (111111111111)
 ```
 
 ## [Organization Structure](org_structure.py)
