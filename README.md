@@ -4,6 +4,41 @@
 
 Detects hierarchy of an under within an AWS Organization.
 
+```
+Root (r-abc1) -> product-a (ou-abc1-abcdef12) -> sku-a (ou-abc1-abcdef22) -> dev (ou-abc1-abcdef33) -> account-1 (111111111111)
+```
+
+```json
+[
+    {
+        "Id": "r-abc1",
+        "Name": "Root",
+        "Type": "ROOT"
+    },
+    {
+        "Id": "ou-abc1-abcdef12",
+        "Name": "product-a",
+        "Type": "ORGANIZATIONAL_UNIT"
+    },
+    {
+        "Id": "ou-abc1-abcdef22",
+        "Name": "sku-a",
+        "Type": "ORGANIZATIONAL_UNIT"
+    },
+    {
+        "Id": "ou-abc1-abcdef33",
+        "Name": "dev",
+        "Type": "ORGANIZATIONAL_UNIT"
+    },
+    {
+        "Id": "111111111111",
+        "Name": "account-1",
+        "Type": "ACCOUNT"
+    }
+]
+Root (r-abc1) -> product-a (ou-abc1-abcdef12) -> sku-a (ou-abc1-abcdef22) -> dev (ou-abc1-abcdef33) -> account-1 (111111111111)
+```
+
 ## [Organization Structure](org_structure.py)
 
 Renders structure of an AWS Organization. Supports text, json, and png outputs.
