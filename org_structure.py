@@ -3,15 +3,20 @@ import json
 from argparse import ArgumentParser
 from diagrams import Diagram, Node
 from diagrams.aws.management import Organizations, OrganizationsAccount, OrganizationsOrganizationalUnit
-from utils import build_list
 
 orgs = boto3.client('organizations')
+children_paginator = orgs.get_paginator('list_children')
+policy_paginator = orgs.get_paginator('list_policies_for_target')
 
 def get_policies(parent_id: str):
-    policies = orgs.list_policies_for_target(TargetId=parent_id, Filter='SERVICE_CONTROL_POLICY')
-    return [
-        policy['Name'] for policy in policies['Policies']
-    ]
+    paginator = policy_paginator.paginate(TargetId=parent_id, Filter='SERVICE_CONTROL_POLICY')
+    policies = []
+
+    for page in paginator:
+        for policy in page['Policies']:
+            policies.append(policy['Name'])
+
+    return policies
 
 def get_children(parent_id: str):
     organization = {'Policies': get_policies(parent_id)}
@@ -50,13 +55,17 @@ def get_children(parent_id: str):
         'Accounts': []
     })
 
-    child_ous = build_list(orgs.list_children, ParentId=parent_id, ChildType='ORGANIZATIONAL_UNIT')['Children']
-    for child_ou in child_ous:
-        organization['OrgUnits'].append(get_children(child_ou['Id']))
+    # Create iterator to go over OU pages
+    for page in children_paginator.paginate(ParentId=parent_id, ChildType='ORGANIZATIONAL_UNIT'):
+        # Go through all the child OUs on this page
+        for child_ou in page['Children']:
+            organization['OrgUnits'].append(get_children(child_ou['Id']))
 
-    child_accounts = build_list(orgs.list_children, ParentId=parent_id, ChildType='ACCOUNT')['Children']
-    for child_account in child_accounts:
-        organization['Accounts'].append(get_children(child_account['Id']))
+    # Create iterator to go over account pages
+    for page in children_paginator.paginate(ParentId=parent_id, ChildType='ACCOUNT'):
+        # Go through all the child accounts on this page
+        for child_account in page['Children']:
+            organization['Accounts'].append(get_children(child_account['Id']))
 
     return organization
 

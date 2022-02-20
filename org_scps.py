@@ -1,22 +1,23 @@
-from argparse import ArgumentParser, FileType
-from utils import build_list
+from argparse import ArgumentParser
 import boto3
 import json
 import os
 
 orgs = boto3.client('organizations')
+policy_paginator = orgs.get_paginator('list_policies')
 
 def get_scps():
     policies = {}
-    results = build_list(orgs.list_policies, Filter='SERVICE_CONTROL_POLICY')
+    paginator = policy_paginator.paginate(Filter='SERVICE_CONTROL_POLICY')
+    
+    for page in paginator:
+        for item in page['Policies']:
+            content = orgs.describe_policy(PolicyId=item['Id'])['Policy']
 
-    for item in results['Policies']:
-        content = orgs.describe_policy(PolicyId=item['Id'])['Policy']
-
-        policies[content['PolicySummary']['Name']] = {
-            'Summary': content['PolicySummary'],
-            'Content': json.loads(content['Content'])
-        }
+            policies[content['PolicySummary']['Name']] = {
+                'Summary': content['PolicySummary'],
+                'Content': json.loads(content['Content'])
+            }
     
     return policies
 
