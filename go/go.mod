@@ -1,4 +1,4 @@
-module github.com/MichaelPalmer1/aws-scripts/go/org-hierarchy
+module github.com/MichaelPalmer1/aws-scripts/go
 
 go 1.17
 
