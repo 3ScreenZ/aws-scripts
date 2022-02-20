@@ -1,10 +1,10 @@
 from argparse import ArgumentParser
+from org_get_account_id import get_account_id
 from utils import build_list
 import boto3
 import json
 
 orgs = boto3.client('organizations')
-account_paginator = orgs.get_paginator('list_accounts')
 
 def get_hierarchy(child_id: str):
     hierarchy = []
@@ -54,14 +54,7 @@ if __name__ == '__main__':
     if opts.account.isnumeric():
         account_id = opts.account
     else:
-        for page in account_paginator.paginate():
-            for account in page['Accounts']:
-                if account['Name'] == opts.account:
-                    account_id = account['Id']
-                    break
-        
-        if not account_id:
-            raise Exception(f'Account "{opts.account}" does not exist in this organization')
+        account_id = get_account_id(opts.account)
 
     # Get hierarchy
     hierarchy = get_hierarchy(account_id)
