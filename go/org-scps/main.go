@@ -74,17 +74,26 @@ func main() {
 			panic(err)
 		}
 
-		bs, err := json.MarshalIndent(policies, "", "  ")
-		if err != nil {
-			panic(err)
-		}
-
 		switch format {
 		case "json":
+			bs, err := json.MarshalIndent(policies, "", "  ")
+			if err != nil {
+				panic(err)
+			}
 			fmt.Println(string(bs))
 		case "file":
-			if err := ioutil.WriteFile(targetId+".json", bs, 0755); err != nil {
+			if err := os.MkdirAll("policies/"+targetId, 0755); err != nil {
 				panic(err)
+			}
+
+			for name, policy := range policies {
+				bs, err := json.MarshalIndent(policy, "", "  ")
+				if err != nil {
+					panic(err)
+				}
+				if err := ioutil.WriteFile(fmt.Sprintf("policies/%s/%s.json", targetId, name), bs, 0755); err != nil {
+					panic(err)
+				}
 			}
 		}
 	}

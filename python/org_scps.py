@@ -73,5 +73,7 @@ if __name__ == '__main__':
         if opts.format == 'json':
             print(json.dumps(policies, indent=4))
         elif opts.format == 'file':
-            with open(f'{opts.target_id}.json', 'w') as f:
-                json.dump(policies, f, indent=4)
+            os.makedirs(f'policies/{opts.target_id}', exist_ok=True)
+            for name, policy in policies.items():
+                with open(f'policies/{opts.target_id}/{name}.json', 'w') as f:
+                    json.dump(policy, f, indent=4)
