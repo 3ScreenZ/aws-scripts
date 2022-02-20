@@ -65,8 +65,6 @@ Root (r-abc1)
     |-- sku-a (ou-abc1-ccc12fde)
     |-- sku-b (ou-abc1-aaa12fde)
 |-- account-9 (999999999999)
-
-Legend: ROOT    OU      ACCOUNT
 ```
 
 ```json
