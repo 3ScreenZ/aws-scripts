@@ -1,8 +1,6 @@
 import boto3
 import json
 from argparse import ArgumentParser
-from diagrams import Diagram, Node
-from diagrams.aws.management import Organizations, OrganizationsAccount, OrganizationsOrganizationalUnit
 
 orgs = boto3.client('organizations')
 children_paginator = orgs.get_paginator('list_children')
@@ -70,6 +68,8 @@ def get_children(parent_id: str):
     return organization
 
 def build_diagram(org_structure: dict, show_ids=False, show_accounts=True, show_policies=False):
+    from diagrams import Diagram, Node
+    from diagrams.aws.management import Organizations, OrganizationsAccount, OrganizationsOrganizationalUnit
     with Diagram(filename='organization', direction='TB', curvestyle='curved', show=False):
         def render_child(child_structure: dict, parent_node: Node = None):
             # Detect node type
